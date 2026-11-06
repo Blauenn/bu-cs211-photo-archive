@@ -1,0 +1,12 @@
+import type { Photo } from "../types/photo";
+
+type Entry = {
+	key: number;
+	value: Photo;
+}
+
+class HashTable {
+	private capacity = 101
+	private buckets = Entry[][]
+	private size = 0
+}

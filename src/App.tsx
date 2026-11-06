@@ -6,16 +6,30 @@ import MergeSort from "./pages/MergeSort"
 import HashTable from "./pages/HashTable"
 import AVLTree from "./pages/AVLTree"
 import NavAddButton from "./components/nav/NavAddButton"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { initialPhotos } from "./data/photos"
 import type { Photo } from "./types/photo"
 
 export default function App() {
 	const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
+	const [isScrolled, setIsScrolled] = useState(false)
+
+	useEffect(() => {
+		// If scrolled for a bit, add shadow to navbar
+		function handleScroll() {
+			setIsScrolled(window.scrollY > 64)
+		}
+
+		window.addEventListener("scroll", handleScroll)
+
+		return () => {
+			window.removeEventListener("scroll", handleScroll)
+		}
+	}, [])
 
 	return (
-		<div className="min-h-screen p-4">
-			<nav className="border border-gray-200 p-4 rounded-2xl flex items-center justify-between">
+		<div className="relative min-h-screen p-4">
+			<nav className={`fixed inset-x-4 z-50 bg-white border border-gray-200 p-4 rounded-2xl flex items-center justify-between ${isScrolled ? "shadow-md" : "shadow-none"} transition-all duration-200`}>
 				<div className="flex items-center gap-4 pl-4">
 					<ImagesIcon size={36} weight="duotone" />
 					<h1 className="text-2xl font-bold">Photo archive</h1>
@@ -30,9 +44,9 @@ export default function App() {
 				</div>
 			</nav>
 
-			<div className="pt-8">
+			<div className="mt-32">
 				<Routes>
-					<Route path="/hashTable" element={<HashTable />} />
+					<Route path="/hashTable" element={<HashTable photos={photos} />} />
 					<Route path="/avlTree" element={<AVLTree />} />
 					<Route path="/mergeSort" element={<MergeSort />} />
 					<Route path="/" element={<Data photos={photos} />} />
