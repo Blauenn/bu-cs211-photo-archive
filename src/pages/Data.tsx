@@ -101,14 +101,13 @@ export default function Data({ photos }: Props) {
 									</div>
 								</td>
 
-								{/* Person */}
+								{/* Photographed person */}
 								<td>
 									<div>
-										<p>
+										<ul className="list-inside list-disc">
 											{photo.people
-												.map((person) => person.facebook || person.instagram)
-												.join(", ")}
-										</p>
+												.map((person) => (<li>{person.facebook || person.instagram}</li>))}
+										</ul>
 									</div>
 								</td>
 
