@@ -1,6 +1,6 @@
 import type { Photo } from "../types/photo";
 
-type Entry<K, V> = {
+export type Entry<K, V> = {
 	key: K;
 	value: V;
 }
@@ -24,7 +24,7 @@ export class HashTable<K extends number, V> {
 		if (typeof key !== "number") {
 			throw new Error("Hash key must be a number!")
 		}
-		return key % this.capacity
+		return ((key % this.capacity) + this.capacity) % this.capacity
 	}
 
 	// O(1)
@@ -62,10 +62,6 @@ export class HashTable<K extends number, V> {
 		return undefined
 	}
 
-	getBuckets(): Entry<K, V>[][] {
-		return this.buckets
-	}
-
 	// O(1)
 	delete(key: K): boolean {
 		const index = this.hash(key)
@@ -88,6 +84,19 @@ export class HashTable<K extends number, V> {
 	get size(): number {
 		return this.entryCount
 	}
+
+	get loadFactor(): number {
+		return this.entryCount / this.capacity
+	}
+
+	getBuckets(): Entry<K, V>[][] {
+		return this.buckets
+	}
+
+	getCapacity(): number {
+		return this.capacity
+	}
+
 }
 
 export function createHashTable(photos: Photo[], tableSize: number) {

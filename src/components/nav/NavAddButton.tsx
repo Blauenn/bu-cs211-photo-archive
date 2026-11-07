@@ -1,4 +1,4 @@
-import { FileArrowUpIcon } from "@phosphor-icons/react";
+import { FolderOpenIcon } from "@phosphor-icons/react";
 import type React from "react";
 import type { SetStateAction } from "react";
 import type { Photo } from "../../types/photo";
@@ -31,7 +31,7 @@ export default function NavAddButton({ setPhotos }: Props) {
 				htmlFor="json-upload"
 				className="flex items-center justify-center px-4"
 			>
-				<FileArrowUpIcon size={42} weight="duotone" className="opacity-40 hover:opacity-100 hover:text-purple-400 transition-all duration-100 cursor-pointer" />
+				<FolderOpenIcon size={42} weight="duotone" className="opacity-40 hover:opacity-100 hover:text-purple-400 transition-all duration-100 cursor-pointer" />
 			</label>
 
 			<input

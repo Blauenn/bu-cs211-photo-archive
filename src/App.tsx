@@ -17,7 +17,7 @@ export default function App() {
 	useEffect(() => {
 		// If scrolled for a bit, add shadow to navbar
 		function handleScroll() {
-			setIsScrolled(window.scrollY > 64)
+			setIsScrolled(window.scrollY > 32)
 		}
 
 		window.addEventListener("scroll", handleScroll)
