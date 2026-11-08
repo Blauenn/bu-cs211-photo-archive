@@ -1,0 +1,77 @@
+import { useEffect, useRef, useState } from "react"
+import type { Photo } from "../types/photo"
+import { AVLTree as AVLTreeStructure } from "../data-structures/avl-tree"
+import { convertAvlTree } from "../utils/avl-tree-ui"
+import { ReactFlow, type ReactFlowInstance } from "@xyflow/react"
+import "@xyflow/react/dist/style.css"
+import PhotoNode from "../components/AVLTree/PhotoNode"
+import StatusDisplay from "../components/StatusDisplay"
+
+type Props = {
+	photos: Photo[]
+}
+
+const nodeTypes = {
+	photo: PhotoNode
+}
+
+export default function AVLTree({ photos }: Props) {
+	const [avlTree, setAvlTree] = useState<AVLTreeStructure | null>(null)
+	const reactFlowInstance = useRef<ReactFlowInstance | null>(null)
+
+	function initializeAvlTree() {
+		const tree = AVLTreeStructure.from(photos)
+		setAvlTree(tree)
+	}
+
+	useEffect(() => {
+		initializeAvlTree()
+	}, [photos])
+
+	const root = avlTree?.getRoot() ?? null
+	const { nodes, edges } = convertAvlTree(root)
+
+	function centerOnRoot() {
+		if (!root || !reactFlowInstance.current) return
+
+		const rootNode = nodes.find(
+			(node) => node.id === String(root.photo.photoId)
+		)
+
+		if (!rootNode) return
+
+		reactFlowInstance.current.fitView({
+			padding: 0.2,
+			duration: 500
+		})
+	}
+
+	useEffect(() => {
+		centerOnRoot()
+	}, [root])
+
+	return (
+		<div className="relative px-4">
+			{avlTree && (
+				<div className="fixed z-10 bottom-8 right-8 flex items-end flex-row-reverse gap-6">
+					<StatusDisplay label="Size" value={avlTree.size} />
+					<StatusDisplay label="Tree height" value={Number(avlTree.treeHeight)} />
+				</div>
+			)}
+
+			<div className="w-full h-[70vh] border border-gray-200 bg-gray-100 rounded-2xl">
+				<ReactFlow
+					nodes={nodes}
+					edges={edges}
+					nodeTypes={nodeTypes}
+					fitView={nodes.length < 20}
+					onInit={(instance) => {
+						reactFlowInstance.current = instance
+						centerOnRoot()
+					}}
+					draggable={false}
+				/>
+			</div>
+		</div>
+	)
+}

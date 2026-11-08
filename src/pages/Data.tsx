@@ -1,6 +1,7 @@
-import { CalendarIcon, CameraIcon, FloppyDiskIcon, HashIcon, ImageIcon, LightbulbIcon, LightningIcon, LightningSlashIcon, UserCircleIcon } from "@phosphor-icons/react";
+import { LightningIcon, LightningSlashIcon } from "@phosphor-icons/react";
 import type { Photo } from "../types/photo";
 import { formatShutterSpeed } from "../utils/numbers";
+import DataTableHead from "../components/Data/DataTableHead";
 
 type Props = {
 	photos: Photo[]
@@ -10,62 +11,7 @@ export default function Data({ photos }: Props) {
 	return (
 		<div className="overflow-x-auto">
 			<table className="data-table w-full border-collapse">
-				<thead>
-					<tr className="border border-gray-300">
-						{/* ID */}
-						<th title="Photo ID">
-							<div>
-								<HashIcon size={20} />
-							</div>
-						</th>
-
-						{/* Image */}
-						<th title="Image">
-							<div>
-								<ImageIcon size={20} weight="duotone" />
-							</div>
-						</th>
-
-						{/* File name */}
-						<th title="File name">
-							<div>
-								<FloppyDiskIcon size={20} weight="duotone" />
-								<p>File name</p>
-							</div>
-						</th>
-
-						{/* Person */}
-						<th title="Photograhped person">
-							<div>
-								<UserCircleIcon size={20} weight="duotone" />
-								<p>Photographed person</p>
-							</div>
-						</th>
-
-						{/* Camera information */}
-						<th title="Camera information">
-							<div>
-								<CameraIcon size={20} weight="duotone" />
-								<p>Camera information</p>
-							</div>
-						</th>
-
-						{/* Exposure settings */}
-						<th title="Exposure settings" colSpan={5}>
-							<div>
-								<LightbulbIcon size={20} weight="duotone" />
-								<p>Exposure settings</p>
-							</div>
-						</th>
-
-						{/* Captured date time */}
-						<th title="Captured date time">
-							<div>
-								<CalendarIcon size={20} weight="duotone" />
-							</div>
-						</th>
-					</tr>
-				</thead>
+				<DataTableHead />
 
 				<tbody>
 					{photos.map((photo) => {
@@ -86,7 +32,7 @@ export default function Data({ photos }: Props) {
 
 								{/* Image */}
 								<td>
-									<div className="flex items-center justify-center">
+									<div className="flex items-center justify-center p-2">
 										<img
 											className="w-16 rounded-md"
 											src={photo.photoUrl}

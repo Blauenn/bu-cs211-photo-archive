@@ -1,114 +1,150 @@
+import type { Edge } from "@xyflow/react";
 import type { AvlNode } from "../data-structures/avl-tree";
-import type { TraversedNode } from "../types/avl-tree-ui";
+import dagre from "@dagrejs/dagre";
+import type { PhotoNode } from "../types/avl-tree-ui";
 
-// Traversals will put all the values within the array...
-// into nodes in their respective method.
-// For UI use.
 
-export function preOrderTraversal(
-	node: AvlNode | null,
-	depth = 0,
-	nodes: TraversedNode[] = []
-) {
-	if (!node) return nodes
+const NODE_WIDTH = 128
+const NODE_HEIGHT = 128
 
-	nodes.push({
-		node: node,
-		depth: depth,
-		position: {
-			x: 0,
-			y: 0
+const NODE_GAP = 40
+const LEVEL_GAP = 100
+
+
+export function convertAvlTree(root: AvlNode | null, onDelete: (photoId: number) => void) {
+	const nodes: PhotoNode[] = []
+	const edges: Edge[] = []
+
+	// Traverse in preorder
+	function traverse(node: AvlNode | null) {
+		if (!node) return
+
+		// Add current node
+		nodes.push({
+			id: String(node.photo.photoId),
+			type: "photo",
+			position: { x: 0, y: 0 },
+			data: {
+				...node.photo,
+				onDelete
+			},
+		})
+
+		// Connect its children 
+		// Using source to point to parent.
+		// Using target to point to child/ren.
+		if (node.left) {
+			edges.push({
+				id: `${node.photo.photoId}-${node.left.photo.photoId}`,
+				source: String(node.photo.photoId),
+				target: String(node.left.photo.photoId),
+				type: "smoothstep"
+			})
 		}
+
+		if (node.right) {
+			edges.push({
+				id: `${node.photo.photoId}-${node.right.photo.photoId}`,
+				source: String(node.photo.photoId),
+				target: String(node.right.photo.photoId),
+				type: "smoothstep"
+			})
+		}
+
+		traverse(node.left)
+		traverse(node.right)
+	}
+
+	traverse(root)
+
+	const graph = new dagre.graphlib.Graph()
+	graph.setDefaultEdgeLabel(() => ({}))
+	graph.setGraph({
+		rankdir: "TB",
+		nodesep: 4,
+		ranksep: 4
 	})
 
-	preOrderTraversal(node.left, depth + 1, nodes)
-	preOrderTraversal(node.right, depth + 1, nodes)
+	// Set each node position
+	for (const node of nodes) {
+		graph.setNode(node.id, {
+			width: NODE_WIDTH,
+			height: NODE_HEIGHT
+		})
+	}
 
-	return nodes
+	for (const edge of edges) {
+		graph.setEdge(edge.source, edge.target)
+	}
+
+	if (root) {
+		const totalWidth = calculateSubtreeWidth(root)
+
+		calculatePositions(
+			root,
+			totalWidth / 2,
+			0,
+			nodes
+		)
+	}
+
+	return { nodes, edges }
 }
 
-export function inOrderTraversal(
-	node: AvlNode | null,
-	depth = 0,
-	nodes: TraversedNode[] = []
-): TraversedNode[] {
-	if (!node) return nodes
+function calculateSubtreeWidth(node: AvlNode | null): number {
+	if (!node) return 0
 
-	inOrderTraversal(node.left, depth + 1, nodes)
+	const leftWidth = calculateSubtreeWidth(node.left)
+	const rightWidth = calculateSubtreeWidth(node.right)
 
-	nodes.push({
-		node,
-		depth,
-		position: {
-			x: 0,
-			y: 0
-		}
-	})
+	if (node.left && node.right) {
+		return leftWidth + NODE_GAP + rightWidth
+	}
 
-	inOrderTraversal(node.right, depth + 1, nodes)
-
-	return nodes
+	return Math.max(NODE_WIDTH, leftWidth, rightWidth)
 }
 
-export const CANVAS_WIDTH = 1024
-export const LEVEL_HEIGHT = 96
-export const START_Y = 64
-export const NODE_RADIUS = 24
-export const NODE_SPACING = 128
-export const INITIAL_OFFSET = 128
-
-export function calculateCanvasHeight(
-	nodes: TraversedNode[],
-	levelHeight: number,
-	startY: number
-) {
-	const maxDepth = Math.max(
-		...nodes.map((item) => item.depth),
-		0
-	)
-
-	return startY + maxDepth * levelHeight + 50
-}
-
-export function calculatePositions(
+function calculatePositions(
 	node: AvlNode | null,
 	x: number,
 	y: number,
-	depth: number,
-	nodes: TraversedNode[] = []
-): TraversedNode[] {
-	if (!node) return nodes
+	nodes: PhotoNode[]
+): void {
+	if (!node) return
 
-	nodes.push({
-		node,
-		depth,
-		position: {
-			x,
+	const leftWidth = calculateSubtreeWidth(node.left)
+	const rightWidth = calculateSubtreeWidth(node.right)
+
+	const currentNode = nodes.find(
+		item => item.id === String(node.photo.photoId)
+	)
+
+	if (currentNode) {
+		currentNode.position = {
+			x: x - NODE_WIDTH / 2,
 			y
 		}
-	})
-
-	const nextOffset = INITIAL_OFFSET * Math.pow(2, depth)
+	}
 
 	if (node.left) {
+		const leftX = x - (rightWidth + NODE_GAP) / 2
+
 		calculatePositions(
 			node.left,
-			x - nextOffset,
-			y + LEVEL_HEIGHT,
-			depth + 1,
+			leftX,
+			y + NODE_HEIGHT + LEVEL_GAP,
 			nodes
 		)
 	}
 
 	if (node.right) {
+		const rightX = x + (leftWidth + NODE_GAP) / 2
+
 		calculatePositions(
 			node.right,
-			x + nextOffset,
-			y + LEVEL_HEIGHT,
-			depth + 1,
+			rightX,
+			y + NODE_HEIGHT + LEVEL_GAP,
 			nodes
 		)
 	}
-
-	return nodes
 }

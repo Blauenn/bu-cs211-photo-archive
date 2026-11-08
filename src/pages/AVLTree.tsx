@@ -1,18 +1,39 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { Photo } from "../types/photo"
-import { AvlNode, AVLTree as AVLTreeStructure } from "../data-structures/avl-tree"
-import { calculateCanvasHeight, calculatePositions, CANVAS_WIDTH, LEVEL_HEIGHT, START_Y } from "../utils/avl-tree-ui"
+import { AVLTree as AVLTreeStructure } from "../data-structures/avl-tree"
+import { convertAvlTree } from "../utils/avl-tree-ui"
+import { ReactFlow, type ReactFlowInstance } from "@xyflow/react"
+import "@xyflow/react/dist/style.css"
+import PhotoNode from "../components/AVLTree/PhotoNode"
+import StatusDisplay from "../components/StatusDisplay"
 
 type Props = {
 	photos: Photo[]
 }
 
+const nodeTypes = {
+	photo: PhotoNode
+}
+
 export default function AVLTree({ photos }: Props) {
 	const [avlTree, setAvlTree] = useState<AVLTreeStructure | null>(null)
+	const reactFlowInstance = useRef<ReactFlowInstance | null>(null)
+
+	const [_, setRevision] = useState(0)
 
 	function initializeAvlTree() {
 		const tree = AVLTreeStructure.from(photos)
 		setAvlTree(tree)
+	}
+
+	function handleDelete(photoId: number) {
+		if (!avlTree) return
+
+		const deleted = avlTree.delete(photoId)
+
+		if (deleted) {
+			setRevision(prev => prev + 1)
+		}
 	}
 
 	useEffect(() => {
@@ -20,92 +41,49 @@ export default function AVLTree({ photos }: Props) {
 	}, [photos])
 
 	const root = avlTree?.getRoot() ?? null
-	const nodes = calculatePositions(
-		root,
-		CANVAS_WIDTH / 2,
-		START_Y,
-		0
-	)
+	const { nodes, edges } = convertAvlTree(root, handleDelete)
 
-	const canvasWidth = CANVAS_WIDTH
-	const canvasHeight = calculateCanvasHeight(
-		nodes,
-		LEVEL_HEIGHT,
-		START_Y
-	)
+	function centerOnRoot() {
+		if (!root || !reactFlowInstance.current) return
 
-	const getNodePosition = (node: AvlNode) => {
-		return nodes.find((item) => item.node === node)?.position
+		const rootNode = nodes.find(
+			(node) => node.id === String(root.photo.photoId)
+		)
+
+		if (!rootNode) return
+
+		reactFlowInstance.current.fitView({
+			padding: 0.2,
+			duration: 500
+		})
 	}
 
+	useEffect(() => {
+		centerOnRoot()
+	}, [root])
+
 	return (
-		<div className="px-4">
-			<h1 className="text-2xl font-semibold mb-4">AVL Tree</h1>
-
-			<div className="w-full h-[1024px] overflow-auto border border-gray-200 rounded-2xl pt-16">
-				<div
-					className="relative"
-					style={{
-						width: canvasWidth,
-						height: canvasHeight
-					}}
-				>
-					<svg
-						className="absolute inset-0 pointer-events-none"
-						width={canvasWidth}
-						height={canvasHeight}
-					>
-						{nodes.map((item) => {
-							const leftChild = item.node.left
-								? getNodePosition(item.node.left)
-								: undefined
-
-							const rightChild = item.node.right
-								? getNodePosition(item.node.right)
-								: undefined
-
-							return (
-								<g key={item.node.photo.photoId}>
-									{leftChild && (
-										<line
-											x1={item.position.x}
-											y1={item.position.y}
-											x2={leftChild.x}
-											y2={leftChild.y}
-											stroke="black"
-											strokeWidth={2}
-										/>
-									)}
-
-									{rightChild && (
-										<line
-											x1={item.position.x}
-											y1={item.position.y}
-											x2={rightChild.x}
-											y2={rightChild.y}
-											stroke="black"
-											strokeWidth={2}
-										/>
-									)}
-								</g>
-							)
-						})}
-					</svg>
-					{nodes.map((item) => (
-						<div
-							key={item.node.photo.photoId}
-							className="absolute border border-gray-200 flex items-center justify-center rounded-full"
-							style={{
-								width: 64,
-								height: 64,
-								left: item.position.x - 64,
-								top: item.position.y - 64
-							}}
-						>
-							<p className="text-2xl font-semibold">{item.node.photo.photoId}</p>
-						</div>
-					))}
+		<div className="relative px-4">
+			{avlTree && (
+				<div className="fixed z-10 bottom-8 right-8 flex items-end flex-row-reverse gap-6">
+					<StatusDisplay label="Size" value={avlTree.size} />
+					<StatusDisplay label="Tree height" value={Number(avlTree.treeHeight)} />
 				</div>
+			)}
+
+			<div className="w-full h-[70vh] border border-gray-200 bg-gray-100 rounded-2xl">
+				<ReactFlow
+					nodes={nodes}
+					edges={edges}
+					nodeTypes={nodeTypes}
+					fitView={nodes.length < 20}
+					onInit={(instance) => {
+						reactFlowInstance.current = instance
+						centerOnRoot()
+					}}
+					nodesDraggable={false}
+					nodesConnectable={false}
+				/>
 			</div>
 		</div>
 	)

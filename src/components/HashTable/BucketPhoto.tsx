@@ -22,7 +22,7 @@ export default function BucketPhoto({ highlight, hashTable, entry, onDelete }: P
 		>
 			<button
 				onClick={handleDelete}
-				className="hidden group-hover:block absolute z-50 bg-red-400 rounded-full p-1 -top-2 -right-3">
+				className="hidden group-hover:block absolute z-50 bg-red-400 rounded-full p-1 -top-2 -right-3 cursor-pointer">
 				<XIcon
 					size={14} className="text-white" />
 			</button>
