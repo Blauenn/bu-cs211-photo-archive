@@ -16,6 +16,10 @@ export default function HashTable({ photos }: Props) {
 	const [search, setSearch] = useState("")
 	const [filteredPhoto, setFilteredPhoto] = useState<Photo | null>(null)
 
+	function initializeHashTable() {
+		setHashTable(createHashTable(photos, tableSize))
+	}
+
 	function handleSearch(value: string) {
 		setSearch(value)
 
@@ -50,11 +54,6 @@ export default function HashTable({ photos }: Props) {
 
 		setHashTable(table)
 	}, [photos, tableSize])
-
-
-	function initializeHashTable() {
-		setHashTable(createHashTable(photos, tableSize))
-	}
 
 	return (
 		<div className="relative px-4">

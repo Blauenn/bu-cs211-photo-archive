@@ -47,7 +47,7 @@ export default function App() {
 			<div className="mt-32">
 				<Routes>
 					<Route path="/hashTable" element={<HashTable photos={photos} />} />
-					<Route path="/avlTree" element={<AVLTree />} />
+					<Route path="/avlTree" element={<AVLTree photos={photos} />} />
 					<Route path="/mergeSort" element={<MergeSort />} />
 					<Route path="/" element={<Data photos={photos} />} />
 				</Routes>

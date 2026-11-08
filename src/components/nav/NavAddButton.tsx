@@ -2,7 +2,7 @@ import { FolderOpenIcon } from "@phosphor-icons/react";
 import type React from "react";
 import type { SetStateAction } from "react";
 import type { Photo } from "../../types/photo";
-import { parseJson } from "../../utils/parse-json";
+import { parseJson } from "../../functions/parse-json";
 
 type Props = {
 	setPhotos: React.Dispatch<SetStateAction<Photo[]>>

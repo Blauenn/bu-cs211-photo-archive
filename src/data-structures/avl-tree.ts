@@ -1,6 +1,7 @@
 import type { Photo } from "../types/photo"
 
-class AvlNode {
+// Export so it can be used by the UI
+export class AvlNode {
 	photo: Photo;
 	left: AvlNode | null = null;
 	right: AvlNode | null = null;
@@ -17,6 +18,7 @@ const update = (n: AvlNode): void => {
 	n.height = 1 + Math.max(height(n.left), height(n.right));
 }
 
+// Promotes left child, root demote to right child
 function rotateRight(y: AvlNode): AvlNode {
 	const x = y.left!;
 	y.left = x.right;
@@ -26,28 +28,29 @@ function rotateRight(y: AvlNode): AvlNode {
 	return x;
 }
 
+// Promotes right child, root demotes to left child
 function rotateLeft(x: AvlNode): AvlNode {
-	const y = x.left!;
-	x.left = y.right;
-	y.right = x;
-	update(y);
+	const y = x.right!;
+	x.right = y.left;
+	y.left = x;
 	update(x);
+	update(y);
 	return y;
 }
 
-function reblance(n: AvlNode): AvlNode {
+function rebalance(n: AvlNode): AvlNode {
 	update(n)
 	const bf = balanceFactor(n);
 
 	if (bf > 1) {
 		// Left-Right
-		if (balanceFactor(n.left!) < 0) n.left = rotateLeft(n.left!); 
+		if (balanceFactor(n.left!) < 0) n.left = rotateLeft(n.left!);
 		return rotateRight(n);
 	}
 
-	if (bf < 1) {
+	if (bf < -1) {
 		// Right-Left
-		if (balanceFactor(n.right!) > 0) n.right = rotateLeft(n.right!); 
+		if (balanceFactor(n.right!) > 0) n.right = rotateRight(n.right!);
 		return rotateLeft(n);
 	}
 	return n
@@ -86,7 +89,7 @@ export class AVLTree {
 			node.photo = photo; // same id => replace
 			return node;
 		}
-		return reblance(node);
+		return rebalance(node);
 	}
 
 	// remove a photo by id. reutnrs true if something was removed.
@@ -113,51 +116,55 @@ export class AVLTree {
 			node.photo = succ.photo;
 			node.right = this.deleteNode(node.right, succ.photo.photoId) // removing the successor decrements count inside the recursie call
 		}
-		return reblance(node);
+		return rebalance(node);
 	}
 
-    // find a photo by id
-    get(photoId: number): Photo | undefined {
-        let n = this.root;
-        while (n) {
-            if (photoId < n.photo.photoId) n = n.left;
-            else if (photoId > n.photo.photoId) n = n.right;
-            else return n.photo;
-        }
-        return undefined;
-    }
+	// find a photo by id
+	get(photoId: number): Photo | undefined {
+		let n = this.root;
+		while (n) {
+			if (photoId < n.photo.photoId) n = n.left;
+			else if (photoId > n.photo.photoId) n = n.right;
+			else return n.photo;
+		}
+		return undefined;
+	}
 
-    has(photoId: number): boolean {
-        return this.get(photoId) !== undefined;
-    }
+	has(photoId: number): boolean {
+		return this.get(photoId) !== undefined;
+	}
 
-    min(): Photo | undefined {
-        let n = this.root;
-        while (n?.left) n = n.left;
-        return n?.photo;
-    }
+	min(): Photo | undefined {
+		let n = this.root;
+		while (n?.left) n = n.left;
+		return n?.photo;
+	}
 
-    max(): Photo | undefined {
-        let n = this.root;
-        while (n?.right) n = n.right;
-        return n?.photo;
-    }
+	max(): Photo | undefined {
+		let n = this.root;
+		while (n?.right) n = n.right;
+		return n?.photo;
+	}
 
-    // all photos with lo <= photoId <= hi, in ascending order.
-    range(lo: number, hi: number): Photo[] {
-        const out: Photo[] = [];
-        const walk = (n: AvlNode | null) => {
-            if (!n) return;
+	// all photos with lo <= photoId <= hi, in ascending order.
+	range(lo: number, hi: number): Photo[] {
+		const out: Photo[] = [];
+		const walk = (n: AvlNode | null) => {
+			if (!n) return;
 			if (lo < n.photo.photoId) walk(n.left);
 			if (lo <= n.photo.photoId && n.photo.photoId <= hi) out.push(n.photo);
 			if (hi > n.photo.photoId) walk(n.right);
-        };
-        walk(this.root);
+		};
+		walk(this.root);
 		return out;
-    }
+	}
 
-    // in-order (ascending photoId) iteration.
-    *[Symbol.iterator](): IterableIterator<Photo> {
+	getRoot(): AvlNode | null {
+		return this.root
+	}
+
+	// in-order (ascending photoId) iteration.
+	*[Symbol.iterator](): IterableIterator<Photo> {
 		const stack: AvlNode[] = [];
 		let cur = this.root;
 		while (cur || stack.length) {
@@ -171,10 +178,10 @@ export class AVLTree {
 		}
 	}
 
-    toArray(): Photo[] {
+	toArray(): Photo[] {
 		return [...this];
 	}
- 
+
 	static from(photos: Iterable<Photo>): AVLTree {
 		const tree = new AVLTree();
 		for (const p of photos) tree.insert(p);
