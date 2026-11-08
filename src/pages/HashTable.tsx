@@ -73,7 +73,7 @@ export default function HashTable({ photos }: Props) {
 							className={`field flex items-center gap-2 border focus-within:border-purple-400`}
 						>
 							<input
-								placeholder="Search photos..."
+								placeholder="Search photos by key..."
 								value={search}
 								onChange={(event) => {
 									handleSearch(event.target.value);
