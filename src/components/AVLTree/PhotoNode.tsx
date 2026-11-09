@@ -11,7 +11,11 @@ export default function PhotoNode({ data }: NodeProps<Node<PhotoNodeData, "photo
 	}
 
 	return (
-		<div className="border border-gray-200 rounded-2xl bg-white shadow-md">
+		<div
+			className={`
+		    ${data.isHighlighted ? "bg-yellow-400 border-transparent" : "border-gray-200"}
+		    border  rounded-2xl bg-white shadow-md`}
+		>
 			<Handle
 				type="target"
 				position={Position.Top}

@@ -1,17 +1,21 @@
 import type { Edge } from "@xyflow/react";
-import type { AvlNode } from "../data-structures/avl-tree";
+import { balanceFactor, type AvlNode } from "../data-structures/avl-tree";
 import dagre from "@dagrejs/dagre";
 import type { PhotoNode } from "../types/avl-tree-ui";
+import type { Photo } from "../types/photo";
 
 
-const NODE_WIDTH = 128
-const NODE_HEIGHT = 128
+export const NODE_WIDTH = 128
+export const NODE_HEIGHT = 128
 
 const NODE_GAP = 40
 const LEVEL_GAP = 100
 
-
-export function convertAvlTree(root: AvlNode | null, onDelete: (photoId: number) => void) {
+export function convertAvlTree(
+	root: AvlNode | null,
+	onDelete: (photoId: number) => void,
+	foundPhoto: Photo | null
+) {
 	const nodes: PhotoNode[] = []
 	const edges: Edge[] = []
 
@@ -26,6 +30,8 @@ export function convertAvlTree(root: AvlNode | null, onDelete: (photoId: number)
 			position: { x: 0, y: 0 },
 			data: {
 				...node.photo,
+				balanceFactor: balanceFactor(node),
+				isHighlighted: foundPhoto?.photoId === node.photo.photoId,
 				onDelete
 			},
 		})

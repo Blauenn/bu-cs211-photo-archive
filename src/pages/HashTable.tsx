@@ -4,6 +4,7 @@ import { createHashTable, HashTable as HashTableStructure } from "../data-struct
 import { ArrowCounterClockwiseIcon, CaretLeftIcon, CaretRightIcon, MaskSadIcon, XCircleIcon } from "@phosphor-icons/react"
 import Buckets from "../components/HashTable/Buckets"
 import StatusDisplay from "../components/StatusDisplay"
+import SearchField from "../components/fields/SearchField"
 
 type Props = {
 	photos: Photo[]
@@ -60,7 +61,9 @@ export default function HashTable({ photos }: Props) {
 			{hashTable && (
 				<div className="fixed z-10 bottom-8 right-8 flex items-end flex-row-reverse gap-6">
 					<StatusDisplay label="Size" value={hashTable.size} />
-					<StatusDisplay label="Load factor" value={Number(hashTable.loadFactor.toFixed(2))} />
+					{hashTable.size > 0 && (
+						<StatusDisplay label="Load factor" value={Number(hashTable.loadFactor.toFixed(2))} />
+					)}
 				</div>
 			)}
 
@@ -68,28 +71,11 @@ export default function HashTable({ photos }: Props) {
 				<div className="flex items-center justify-between gap-6 mb-4">
 					<div className="w-full flex flex-col self-end gap-2">
 						<p className="font-semibold opacity-50 ml-1">Search</p>
-						<div
-							className={`field flex items-center gap-2 border focus-within:border-purple-400`}
-						>
-							<input
-								placeholder="Search photos by key..."
-								value={search}
-								onChange={(event) => {
-									handleSearch(event.target.value);
-								}}
-								className="flex-1 outline-none"
-							/>
-
-							<button
-								type="button"
-								onClick={() => {
-									setSearch("")
-								}}
-								className="cursor-pointer opacity-50 hover:text-red-400 hover:opacity-100 transition-all duration-100"
-							>
-								<XCircleIcon size={20} />
-							</button>
-						</div>
+						<SearchField
+							value={search}
+							onChange={handleSearch}
+							placeholder="Search photos by key..."
+						/>
 					</div>
 
 					<div className="flex gap-2">

@@ -14,6 +14,8 @@ export type TraversedNode = {
 }
 
 export type PhotoNodeData = Photo & {
+	balanceFactor: number
+	isHighlighted: boolean
 	onDelete: (photoId: number) => void
 }
 

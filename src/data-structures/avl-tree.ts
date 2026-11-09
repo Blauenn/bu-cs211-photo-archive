@@ -13,7 +13,7 @@ export class AvlNode {
 }
 
 const height = (n: AvlNode | null): number => (n ? n.height : 0);
-const balanceFactor = (n: AvlNode): number => height(n.left) - height(n.right);
+export const balanceFactor = (n: AvlNode): number => height(n.left) - height(n.right);
 const update = (n: AvlNode): void => {
 	n.height = 1 + Math.max(height(n.left), height(n.right));
 }

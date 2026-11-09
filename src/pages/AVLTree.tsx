@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import type { Photo } from "../types/photo"
-import { AVLTree as AVLTreeStructure } from "../data-structures/avl-tree"
-import { convertAvlTree } from "../utils/avl-tree-ui"
+import { AVLTree as AVLTreeStructure, balanceFactor } from "../data-structures/avl-tree"
+import { convertAvlTree, NODE_HEIGHT, NODE_WIDTH } from "../utils/avl-tree-ui"
 import { ReactFlow, type ReactFlowInstance } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import PhotoNode from "../components/AVLTree/PhotoNode"
 import StatusDisplay from "../components/StatusDisplay"
+import SearchField from "../components/fields/SearchField"
+import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react"
 
 type Props = {
 	photos: Photo[]
@@ -26,6 +28,27 @@ export default function AVLTree({ photos }: Props) {
 		setAvlTree(tree)
 	}
 
+	const [search, setSearch] = useState("")
+	const [foundPhoto, setFoundPhoto] = useState<Photo | null>(null)
+
+	function handleSearch(value: string) {
+		setSearch(value)
+		setFoundPhoto(null)
+
+		if (!avlTree || !value.trim()) return
+
+		const photoId = Number(value)
+
+		if (Number.isNaN(photoId)) return
+
+		const photo = avlTree.get(photoId)
+
+		if (!photo) return
+
+		setFoundPhoto(photo)
+		centerOnNode(photo.photoId)
+	}
+
 	function handleDelete(photoId: number) {
 		if (!avlTree) return
 
@@ -41,37 +64,70 @@ export default function AVLTree({ photos }: Props) {
 	}, [photos])
 
 	const root = avlTree?.getRoot() ?? null
-	const { nodes, edges } = convertAvlTree(root, handleDelete)
+	const { nodes, edges } = convertAvlTree(root, handleDelete, foundPhoto)
 
-	function centerOnRoot() {
-		if (!root || !reactFlowInstance.current) return
+	function centerOnNode(photoId: number) {
+		if (!reactFlowInstance.current) return
 
-		const rootNode = nodes.find(
-			(node) => node.id === String(root.photo.photoId)
+		const targetNode = nodes.find(
+			node => node.id === String(photoId)
 		)
 
-		if (!rootNode) return
+		if (!targetNode) return
 
-		reactFlowInstance.current.fitView({
-			padding: 0.2,
-			duration: 500
-		})
+		reactFlowInstance.current.setCenter(
+			targetNode.position.x + NODE_WIDTH / 2,
+			targetNode.position.y + NODE_HEIGHT / 2,
+			{
+				zoom: 1,
+				duration: 500
+			}
+		)
 	}
 
 	useEffect(() => {
-		centerOnRoot()
+		if (root) {
+			centerOnNode(root.photo.photoId)
+		}
 	}, [root])
 
 	return (
-		<div className="relative px-4">
-			{avlTree && (
-				<div className="fixed z-10 bottom-8 right-8 flex items-end flex-row-reverse gap-6">
-					<StatusDisplay label="Size" value={avlTree.size} />
-					<StatusDisplay label="Tree height" value={Number(avlTree.treeHeight)} />
+		<div className="px-4">
+			<div className="flex items-center justify-between gap-6 mb-4">
+				<div className="w-full flex flex-col self-end gap-2">
+					<p className="font-semibold opacity-50 ml-1">Search</p>
+					<SearchField
+						value={search}
+						onChange={handleSearch}
+						placeholder="Search photos by key..."
+					/>
 				</div>
-			)}
+				<button
+					onClick={initializeAvlTree}
+					className="button px-4 py-2 flex self-end items-center gap-3">
+					<ArrowCounterClockwiseIcon size={20} />
+					<p>Regenerate</p>
+				</button>
+			</div>
 
-			<div className="w-full h-[70vh] border border-gray-200 bg-gray-100 rounded-2xl">
+			<div className="relative w-full h-[80vh] border border-gray-200 bg-gray-100 rounded-2xl">
+				{avlTree && (
+					<div className="fixed z-10 bottom-16 right-16 flex items-end flex-row-reverse gap-6">
+						<StatusDisplay label="Size" value={avlTree.size} />
+						{avlTree.size > 0 && (
+							<>
+								<StatusDisplay label="Tree height" value={Number(avlTree.treeHeight)} />
+								<StatusDisplay
+									label="Balance factor"
+									value={avlTree.getRoot()
+										? balanceFactor(avlTree.getRoot()!)
+										: 0}
+								/>
+							</>
+						)}
+					</div>
+				)}
+
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -79,7 +135,7 @@ export default function AVLTree({ photos }: Props) {
 					fitView={nodes.length < 20}
 					onInit={(instance) => {
 						reactFlowInstance.current = instance
-						centerOnRoot()
+						centerOnNode(root?.photo.photoId)
 					}}
 					nodesDraggable={false}
 					nodesConnectable={false}
