@@ -63,16 +63,23 @@ export default function MergeSort({ photos }: Props) {
 		<div className="px-4">
 			<div className="flex items-center justify-between gap-6 mb-8">
 				<div className="flex items-center gap-2">
-					<p className="text-2xl font-semibold">Merge sort</p>
+					<p className="text-2xl font-semibold">Merge sort <span className="opacity-40">— {!descending ? "Ascending" : "Descending"}</span></p>
 				</div>
 				<div className="flex gap-4">
 					<button
 						onClick={() => {
 							setDescending(!descending)
 						}}
-						className="button px-4 py-2 flex items-center gap-3"
+						disabled={sortBy == "unsorted"}
+						className={`
+						    ${sortBy == "unsorted"
+								? "opacity-50"
+								: "hover:bg-purple-400 hover:text-white hover:border-transparent cursor-pointer"
+							}
+						    border border-gray-200 rounded-2xl px-4 py-2 flex items-center gap-3`}
 					>
-						{!descending
+						{/* Ascending showing means click to switch to ascending and vice versa */}
+						{descending
 							? (
 								<>
 									<SortAscendingIcon size={20} />
