@@ -68,6 +68,7 @@ export class AVLTree {
 		return height(this.root);
 	}
 
+	// O (log n)
 	insert(photo: Photo): void {
 		this.root = this.insertNode(this.root, photo);
 	}
@@ -93,6 +94,7 @@ export class AVLTree {
 	}
 
 	// remove a photo by id. reutnrs true if something was removed.
+	// O (log n)
 	delete(photoId: number): boolean {
 		const before = this.count;
 		this.root = this.deleteNode(this.root, photoId);
@@ -120,6 +122,7 @@ export class AVLTree {
 	}
 
 	// find a photo by id
+	// O(log n)
 	get(photoId: number): Photo | undefined {
 		let n = this.root;
 		while (n) {
@@ -159,6 +162,7 @@ export class AVLTree {
 		return out;
 	}
 
+	// O (1)
 	getRoot(): AvlNode | null {
 		return this.root
 	}

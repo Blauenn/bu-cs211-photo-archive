@@ -1,4 +1,6 @@
-export function convertToLocalTime(dateTime: string) {
+import type { LocalTime } from "../types/date";
+
+export function convertToLocalTime(dateTime: string): LocalTime {
 	const [datePart, timePart] = dateTime.split(" ");
 	const [year, month, day] = datePart.split("-").map(Number);
 	const [hours, minutes, seconds] = timePart.split(":").map(Number);
