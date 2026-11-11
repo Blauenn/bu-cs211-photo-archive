@@ -14,7 +14,9 @@ const LEVEL_GAP = 100
 export function convertAvlTree(
 	root: AvlNode | null,
 	onDelete: (photoId: number) => void,
-	foundPhoto: Photo | null
+	foundPhoto: Photo | null,
+	currentPhoto: Photo | null | undefined,
+	onSelect: (photo: Photo) => void,
 ) {
 	const nodes: PhotoNode[] = []
 	const edges: Edge[] = []
@@ -32,7 +34,9 @@ export function convertAvlTree(
 				...node.photo,
 				balanceFactor: balanceFactor(node),
 				isHighlighted: foundPhoto?.photoId === node.photo.photoId,
-				onDelete
+				onDelete,
+				onSelect,
+				currentPhoto,
 			},
 		})
 

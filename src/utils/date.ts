@@ -18,6 +18,17 @@ export function convertToLocalTime(dateTime: string): LocalTime {
 		hour12: false,
 	}).formatToParts(date);
 
-	return Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+	const formatted = Object.fromEntries(
+		parts.map(({ type, value }) => [type, value])
+	)
+
+	return {
+		day: formatted.day,
+		month: formatted.month,
+		year: formatted.year,
+		hour: formatted.hour,
+		minute: formatted.minute,
+		second: formatted.second,
+	}
 }
 

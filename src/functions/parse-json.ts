@@ -3,8 +3,6 @@ import type { Photo } from "../types/photo"
 export async function parseJson(file: File): Promise<Photo[]> {
 	const jsonFile = await file.text()
 	const data = JSON.parse(jsonFile)
-	console.log("Raw SQL rows:", data.length)
-	console.log("Unique image IDs:", new Set(data.map(row => row.image_id)).size)
 
 	const photos = new Map<number, Photo>()
 	const addedPeople = new Map<number, Set<number>>()
@@ -58,6 +56,5 @@ export async function parseJson(file: File): Promise<Photo[]> {
 		}
 	}
 
-	console.log("Parsed photos:", photos.size)
 	return Array.from(photos.values())
 }

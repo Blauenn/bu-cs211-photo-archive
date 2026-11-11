@@ -1,3 +1,12 @@
-import type { Photo } from "./photo";
-
-export type SortKey = keyof Photo | "unsorted"
+export type SortKey =
+	| "unsorted"
+	| "photoId"
+	| "fileName"
+	| "cameraName"
+	| "cameraModel"
+	| "lensModel"
+	| "exposureTime"
+	| "aperture"
+	| "iso"
+	| "shotFocalLength"
+	| "dateTimeOriginal"

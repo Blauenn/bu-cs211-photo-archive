@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react"
 import type { Photo } from "../types/photo"
 import { AVLTree as AVLTreeStructure, balanceFactor } from "../data-structures/avl-tree"
 import { convertAvlTree, NODE_HEIGHT, NODE_WIDTH } from "../utils/avl-tree-ui"
-import { ReactFlow, type ReactFlowInstance } from "@xyflow/react"
+import { ReactFlow, type ReactFlowInstance, type Edge } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
-import PhotoNode from "../components/AVLTree/PhotoNode"
 import StatusDisplay from "../components/StatusDisplay"
 import SearchField from "../components/fields/SearchField"
 import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react"
+import type { PhotoNode as PhotoNodeStructure } from "../types/avl-tree-ui"
+import PhotoNode from "../components/AVLTree/PhotoNode"
+import PhotoPreview from "../components/PhotoInfo/PhotoPreview"
 
 type Props = {
 	photos: Photo[]
@@ -19,7 +21,7 @@ const nodeTypes = {
 
 export default function AVLTree({ photos }: Props) {
 	const [avlTree, setAvlTree] = useState<AVLTreeStructure | null>(null)
-	const reactFlowInstance = useRef<ReactFlowInstance | null>(null)
+	const reactFlowInstance = useRef<ReactFlowInstance<PhotoNodeStructure, Edge> | null>(null)
 
 	const [_, setRevision] = useState(0)
 
@@ -63,8 +65,20 @@ export default function AVLTree({ photos }: Props) {
 		initializeAvlTree()
 	}, [photos])
 
+	const [currentPhoto, setCurrentPhoto] = useState<Photo | null>()
+
+	function handleSetCurrentPhoto(photo: Photo) {
+		setCurrentPhoto(photo)
+	}
+
 	const root = avlTree?.getRoot() ?? null
-	const { nodes, edges } = convertAvlTree(root, handleDelete, foundPhoto)
+	const { nodes, edges } = convertAvlTree(
+		root,
+		handleDelete,
+		foundPhoto,
+		currentPhoto,
+		handleSetCurrentPhoto
+	)
 
 	function centerOnNode(photoId: number) {
 		if (!reactFlowInstance.current) return
@@ -110,9 +124,30 @@ export default function AVLTree({ photos }: Props) {
 				</button>
 			</div>
 
-			<div className="relative w-full h-[80vh] border border-gray-200 bg-gray-100 rounded-2xl">
+			<div className="flex gap-4 relative w-full h-[80vh] border border-gray-200 bg-gray-100 rounded-2xl">
+				<ReactFlow
+					nodes={nodes}
+					edges={edges}
+					nodeTypes={nodeTypes}
+					fitView={nodes.length < 20}
+					onInit={(instance) => {
+						reactFlowInstance.current = instance
+						root && centerOnNode(root.photo.photoId)
+					}}
+					nodesDraggable={false}
+					nodesConnectable={false}
+				/>
+
+				{currentPhoto && (
+					<div className="absolute top-4 right-4 bottom-4 z-10 w-80 overflow-y-auto overflow-hidden">
+						<div className="bg-white rounded-2xl">
+							<PhotoPreview photo={currentPhoto} />
+						</div>
+					</div>
+				)}
+
 				{avlTree && (
-					<div className="fixed z-10 bottom-16 right-16 flex items-end flex-row-reverse gap-6">
+					<div className="fixed z-10 bottom-16 left-16 flex items-end flex-row gap-6">
 						<StatusDisplay label="Size" value={avlTree.size} />
 						{avlTree.size > 0 && (
 							<>
@@ -127,19 +162,6 @@ export default function AVLTree({ photos }: Props) {
 						)}
 					</div>
 				)}
-
-				<ReactFlow
-					nodes={nodes}
-					edges={edges}
-					nodeTypes={nodeTypes}
-					fitView={nodes.length < 20}
-					onInit={(instance) => {
-						reactFlowInstance.current = instance
-						centerOnNode(root?.photo.photoId)
-					}}
-					nodesDraggable={false}
-					nodesConnectable={false}
-				/>
 			</div>
 		</div>
 	)

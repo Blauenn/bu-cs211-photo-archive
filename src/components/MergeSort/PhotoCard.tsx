@@ -1,3 +1,4 @@
+import { XIcon } from "@phosphor-icons/react";
 import type { LocalTime } from "../../types/date";
 import type { SortKey } from "../../types/merge-sort";
 import type { Photo } from "../../types/photo"
@@ -8,9 +9,12 @@ type Props = {
 	index: number;
 	photo: Photo;
 	sortBy: SortKey;
+	onDelete: (photoId: number) => void
+	selected: boolean
+	onSelect: (photo: Photo) => void
 }
 
-export default function PhotoCard({ index, photo, sortBy }: Props) {
+export default function PhotoCard({ index, photo, sortBy, onDelete, selected, onSelect }: Props) {
 	const dateTime: LocalTime = convertToLocalTime(String(photo.dateTimeOriginal))
 
 	const formattedPhoto = {
@@ -27,7 +31,14 @@ export default function PhotoCard({ index, photo, sortBy }: Props) {
 	}
 
 	return (
-		<div className="relative border border-gray-200 rounded-2xl shadow-sm flex flex-col items-center gap-4 p-3">
+		<div
+			onClick={() => onSelect(photo)}
+			className={`
+			    ${selected
+					? "border-2 border-purple-400/50"
+					: "border border-gray-200 hover:border-purple-400/50"
+				}
+			    relative group border-gray-200 rounded-2xl shadow-sm flex flex-col items-center gap-4 p-3 transition-all duration-100`}>
 			{sortBy != "unsorted" && (
 				<div className="absolute size-10 -left-3 -top-3 z-10 bg-purple-400 text-white p-2 shadow-sm flex items-center justify-center rounded-full">
 					<p className={`${String(index).length >= 3
@@ -38,6 +49,16 @@ export default function PhotoCard({ index, photo, sortBy }: Props) {
 					</p>
 				</div>
 			)}
+
+			<button
+				onClick={(event) => {
+					event.stopPropagation()
+					onDelete(photo.photoId)
+				}}
+				className="hidden group-hover:block absolute z-50 bg-red-400 rounded-full p-1 -top-2 -right-3 cursor-pointer">
+				<XIcon
+					size={16} className="text-white" />
+			</button>
 
 			<div className="flex-1 flex items-center">
 				<img

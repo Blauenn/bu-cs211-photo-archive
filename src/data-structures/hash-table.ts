@@ -1,5 +1,6 @@
 import type { Photo } from "../types/photo";
 
+// K, V are variables, it let's you create the same shape but with different types.
 export type Entry<K, V> = {
 	key: K;
 	value: V;
@@ -8,7 +9,7 @@ export type Entry<K, V> = {
 export class HashTable<K extends number, V> {
 	private capacity = 101
 	private buckets: Entry<K, V>[][]
-	private entryCount = 0
+	private entryCount = 0 // entryCount = size (size is used by the getter)
 
 	constructor(capacity: number = 101) {
 		this.capacity = capacity
@@ -24,6 +25,7 @@ export class HashTable<K extends number, V> {
 		if (typeof key !== "number") {
 			throw new Error("Hash key must be a number!")
 		}
+		// Modulo twice to prevent negative values
 		return ((key % this.capacity) + this.capacity) % this.capacity
 	}
 
@@ -70,8 +72,8 @@ export class HashTable<K extends number, V> {
 		let i = 0
 		while (i < bucket.length) {
 			if (bucket[i].key === key) {
-				bucket.splice(i, 1)
-				this.entryCount--
+				bucket.splice(i, 1) // Remove from the bucket
+				this.entryCount-- // size -1
 				return true
 			}
 
@@ -102,6 +104,7 @@ export class HashTable<K extends number, V> {
 export function createHashTable(photos: Photo[], tableSize: number) {
 	const table = new HashTable<number, Photo>(tableSize)
 
+	// Create values from all the objects in data/photos
 	for (const photo of photos) {
 		table.insert(photo.photoId, photo)
 	}

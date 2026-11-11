@@ -52,7 +52,7 @@ export default function Data({ photos }: Props) {
 									<div>
 										<ul className="list-inside list-disc">
 											{photo.people
-												.map((person) => (<li title={person.facebook || person.instagram} className="w-full truncate" key={person.personId}>{person.facebook || person.instagram}</li>))}
+												.map((person) => (<li className="w-full truncate" key={person.personId}>{person.facebook || person.instagram}</li>))}
 										</ul>
 									</div>
 								</td>

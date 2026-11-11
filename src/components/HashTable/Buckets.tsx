@@ -8,9 +8,11 @@ type Props = {
 	filteredPhoto: Photo | null;
 	search: string;
 	setRevision: React.Dispatch<SetStateAction<number>>
+	currentPhoto: Photo | null | undefined
+	onSelect: (photo: Photo) => void
 }
 
-export default function Buckets({ hashTable, filteredPhoto, search, setRevision }: Props) {
+export default function Buckets({ hashTable, filteredPhoto, search, setRevision, currentPhoto, onSelect }: Props) {
 	return (
 		<div className="w-full border border-gray-200 rounded-2xl flex flex-col gap-4 p-4">
 			{search.trim() && !filteredPhoto ? (
@@ -57,11 +59,11 @@ export default function Buckets({ hashTable, filteredPhoto, search, setRevision 
 											hashTable={hashTable}
 											entry={entry}
 											onDelete={() => setRevision(prev => prev + 1)}
+											selected={entry.value.photoId == currentPhoto?.photoId}
+											onSelect={onSelect}
 										/>
 									)
-								}
-
-								)}
+								})}
 							</div>
 						</div>
 					)

@@ -1,9 +1,8 @@
 import type { SortKey } from "../../types/merge-sort"
-import type { Photo } from "../../types/photo"
 
 type Props = {
 	value: SortKey
-	onChange: (value: keyof Photo) => void
+	onChange: (value: SortKey) => void
 }
 
 const sortOptions: { key: SortKey; label: string }[] = [
@@ -24,7 +23,7 @@ export default function SortSelect({ value, onChange }: Props) {
 	return (
 		<select
 			value={value}
-			onChange={(event) => onChange(event.target.value as keyof Photo)}
+			onChange={(event) => onChange(event.target.value as SortKey)}
 			className="field"
 		>
 			{sortOptions.map(({ key, label }) => (

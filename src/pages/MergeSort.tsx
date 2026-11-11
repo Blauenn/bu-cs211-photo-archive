@@ -1,23 +1,33 @@
 import { useEffect, useState } from "react"
 import { mergeSort } from "../algorithms/merge-sort"
 import type { Photo } from "../types/photo"
-import { SortAscendingIcon, SortDescendingIcon } from "@phosphor-icons/react"
+import { ArrowCounterClockwiseIcon, SortAscendingIcon, SortDescendingIcon } from "@phosphor-icons/react"
 import PhotoCard from "../components/MergeSort/PhotoCard"
 import SortSelect from "../components/MergeSort/SortSelect"
 import type { SortKey } from "../types/merge-sort"
+import PhotoPreview from "../components/PhotoInfo/PhotoPreview"
 
 type Props = {
 	photos: Photo[]
 }
 
 export default function MergeSort({ photos }: Props) {
+	const [localPhotos, setLocalPhotos] = useState<Photo[]>(photos)
 	const [sortedPhotos, setSortedPhotos] = useState<Photo[]>([])
 	const [sortBy, setSortBy] = useState<SortKey>("unsorted")
 	const [descending, setDescending] = useState(false)
 
 	useEffect(() => {
+		setLocalPhotos(photos)
 		setSortedPhotos([])
 	}, [photos])
+
+	function initializePhotos() {
+		setLocalPhotos([...photos])
+		setSortedPhotos([])
+		setSortBy("unsorted")
+		setDescending(false)
+	}
 
 	useEffect(() => {
 		if (sortBy === "unsorted") {
@@ -30,7 +40,7 @@ export default function MergeSort({ photos }: Props) {
 
 	function handleSort() {
 		if (sortBy != "unsorted") {
-			const result = mergeSort(photos, (a, b) => {
+			const result = mergeSort(localPhotos, (a, b) => {
 				const first = a[sortBy]
 				const second = b[sortBy]
 
@@ -57,6 +67,25 @@ export default function MergeSort({ photos }: Props) {
 		} else {
 			setSortedPhotos([])
 		}
+	}
+
+	function handleDelete(photoId: number) {
+		setLocalPhotos((prev) =>
+			prev.filter((photo) => photo.photoId !== photoId)
+		)
+
+		setSortedPhotos((prev) =>
+			prev.filter((photo) => photo.photoId !== photoId)
+		)
+		setCurrentPhoto((prev) =>
+			prev?.photoId === photoId ? null : prev
+		)
+	}
+
+	const [currentPhoto, setCurrentPhoto] = useState<Photo | null>()
+
+	function handleSetCurrentPhoto(photo: Photo) {
+		setCurrentPhoto(photo)
 	}
 
 	return (
@@ -97,28 +126,50 @@ export default function MergeSort({ photos }: Props) {
 						value={sortBy}
 						onChange={setSortBy}
 					/>
+					<button
+						onClick={initializePhotos}
+						className="button px-4 py-2 flex self-end items-center gap-3">
+						<ArrowCounterClockwiseIcon size={20} />
+						<p>Regenerate</p>
+					</button>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 gap-4">
-				{sortedPhotos.length > 0 ? (
-					sortedPhotos.map((photo, index) => (
-						<PhotoCard
-							key={photo.photoId}
-							index={index}
-							photo={photo}
-							sortBy={sortBy}
-						/>
-					))
-				) : (
-					photos.map((photo, index) => (
-						<PhotoCard
-							key={photo.photoId}
-							index={index}
-							photo={photo}
-							sortBy={sortBy}
-						/>
-					))
+			<div className="flex gap-8">
+				<div className={`h-full grid grid-cols-2 
+				    ${currentPhoto
+						? "basis-9/12 grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7"
+						: "basis-12/12 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9"} 
+				     gap-4`}>
+					{sortedPhotos.length > 0 ? (
+						sortedPhotos.map((photo, index) => (
+							<PhotoCard
+								key={photo.photoId}
+								index={index}
+								photo={photo}
+								sortBy={sortBy}
+								onDelete={handleDelete}
+								selected={photo.photoId == currentPhoto?.photoId}
+								onSelect={handleSetCurrentPhoto}
+							/>
+						))
+					) : (
+						localPhotos.map((photo, index) => (
+							<PhotoCard
+								key={photo.photoId}
+								index={index}
+								photo={photo}
+								sortBy={sortBy}
+								onDelete={handleDelete}
+								selected={photo.photoId == currentPhoto?.photoId}
+								onSelect={handleSetCurrentPhoto}
+							/>
+						))
+					)}
+				</div>
+
+				{currentPhoto && (
+					<PhotoPreview photo={currentPhoto} sortBy={sortBy} />
 				)}
 			</div>
 		</div>

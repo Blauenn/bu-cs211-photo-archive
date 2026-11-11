@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import type { Photo } from "../types/photo"
 import { createHashTable, HashTable as HashTableStructure } from "../data-structures/hash-table"
-import { ArrowCounterClockwiseIcon, CaretLeftIcon, CaretRightIcon, MaskSadIcon, XCircleIcon } from "@phosphor-icons/react"
+import { ArrowCounterClockwiseIcon, CaretLeftIcon, CaretRightIcon, MaskSadIcon } from "@phosphor-icons/react"
 import Buckets from "../components/HashTable/Buckets"
 import StatusDisplay from "../components/StatusDisplay"
 import SearchField from "../components/fields/SearchField"
+import PhotoPreview from "../components/PhotoInfo/PhotoPreview"
 
 type Props = {
 	photos: Photo[]
@@ -56,17 +57,14 @@ export default function HashTable({ photos }: Props) {
 		setHashTable(table)
 	}, [photos, tableSize])
 
+	const [currentPhoto, setCurrentPhoto] = useState<Photo | null>()
+
+	function handleSetCurrentPhoto(photo: Photo) {
+		setCurrentPhoto(photo)
+	}
+
 	return (
 		<div className="relative px-4">
-			{hashTable && (
-				<div className="fixed z-10 bottom-8 right-8 flex items-end flex-row-reverse gap-6">
-					<StatusDisplay label="Size" value={hashTable.size} />
-					{hashTable.size > 0 && (
-						<StatusDisplay label="Load factor" value={Number(hashTable.loadFactor.toFixed(2))} />
-					)}
-				</div>
-			)}
-
 			{hashTable && (
 				<div className="flex items-center justify-between gap-6 mb-4">
 					<div className="w-full flex flex-col self-end gap-2">
@@ -142,7 +140,24 @@ export default function HashTable({ photos }: Props) {
 			)}
 
 			{hashTable ? (
-				<Buckets hashTable={hashTable} filteredPhoto={filteredPhoto} search={search} setRevision={setRevision} />
+				<div className="flex gap-8">
+					<div className={`
+				    ${currentPhoto ? "basis-9/12" : "basis-12/12"} 
+					    `}>
+						<Buckets
+							hashTable={hashTable}
+							filteredPhoto={filteredPhoto}
+							search={search}
+							setRevision={setRevision}
+							currentPhoto={currentPhoto}
+							onSelect={handleSetCurrentPhoto}
+						/>
+					</div>
+
+					{currentPhoto && (
+						<PhotoPreview photo={currentPhoto} />
+					)}
+				</div>
 			) : (
 
 				<div className="mt-32 min-w-screen flex flex-col items-center justify-center gap-8">
@@ -155,6 +170,16 @@ export default function HashTable({ photos }: Props) {
 					</div>
 				</div>
 			)}
-		</div>
+
+			{hashTable && (
+				<div className="fixed z-10 bottom-8 right-8 flex items-end flex-row-reverse gap-6">
+					<StatusDisplay label="Size" value={hashTable.size} />
+					{hashTable.size > 0 && (
+						<StatusDisplay label="Load factor" value={Number(hashTable.loadFactor.toFixed(2))} />
+					)}
+				</div>
+			)
+			}
+		</div >
 	)
 }

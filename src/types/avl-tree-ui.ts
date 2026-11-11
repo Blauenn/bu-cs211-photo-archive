@@ -17,6 +17,8 @@ export type PhotoNodeData = Photo & {
 	balanceFactor: number
 	isHighlighted: boolean
 	onDelete: (photoId: number) => void
+	onSelect: (photo: Photo) => void
+	currentPhoto: Photo | null | undefined
 }
 
 export type PhotoNode = Node<PhotoNodeData, "photo">
