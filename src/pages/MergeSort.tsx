@@ -169,7 +169,7 @@ export default function MergeSort({ photos }: Props) {
 				</div>
 
 				{currentPhoto && (
-					<PhotoPreview photo={currentPhoto} sortBy={sortBy} />
+					<PhotoPreview photo={currentPhoto} sortBy={sortBy} className="sticky top-32 h-[80vh] overflow-scroll" />
 				)}
 			</div>
 		</div>

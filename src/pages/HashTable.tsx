@@ -155,7 +155,7 @@ export default function HashTable({ photos }: Props) {
 					</div>
 
 					{currentPhoto && (
-						<PhotoPreview photo={currentPhoto} />
+						<PhotoPreview photo={currentPhoto} className="sticky top-32 h-[80vh] overflow-scroll" />
 					)}
 				</div>
 			) : (

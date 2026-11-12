@@ -17,13 +17,16 @@ import type { SortKey } from "../../types/merge-sort"
 type Props = {
 	photo: Photo
 	sortBy?: SortKey
+	className?: string
 }
 
-export default function PhotoPreview({ photo, sortBy }: Props) {
+export default function PhotoPreview({ photo, sortBy, className }: Props) {
 	const dateTime = convertToLocalTime(String(photo.dateTimeOriginal))
 
 	return (
-		<div className="basis-3/12 self-start w-full border border-gray-200 shadow-sm p-8 rounded-2xl flex flex-col">
+		<div className={`
+		    ${className} 
+		    basis-3/12 self-start w-full border border-gray-200 shadow-sm p-8 rounded-2xl flex flex-col`}>
 			<div className="flex flex-col gap-2 mb-4">
 				<PhotoInfoRow
 					icon={<HashIcon size={20} />}
