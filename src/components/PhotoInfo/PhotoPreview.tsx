@@ -7,6 +7,7 @@ import {
 	MountainsIcon,
 	CalendarIcon,
 	FloppyDiskIcon,
+	UserCircleIcon,
 } from "@phosphor-icons/react"
 import type { Photo } from "../../types/photo"
 import PhotoInfoRow from "./PhotoInfoRow"
@@ -50,16 +51,31 @@ export default function PhotoPreview({ photo, sortBy, className }: Props) {
 				className="rounded-xl shadow-sm mb-6"
 			/>
 
-			<div className="opacity-50 flex items-center gap-3 mb-2">
-				<CameraIcon size={18} weight="duotone" />
-				<p className="text-sm">Camera information</p>
+			<div>
+				<div className="opacity-50 flex items-center gap-3 mb-2">
+					<CameraIcon size={18} weight="duotone" />
+					<p className="text-sm">Camera information</p>
+				</div>
+
+				<div className="flex flex-col gap-1 mb-6">
+					<p className="text-lg font-semibold">
+						<span className={`${sortBy == "cameraName" && "text-yellow-400 font-semibold underline"}`}>{photo.cameraName}</span> <span className={`${sortBy == "cameraModel" && "text-yellow-400 font-semibold underline"}`}>{photo.cameraModel}</span>
+					</p>
+					<p className="opacity-50"><span className={`${sortBy == "lensModel" && "text-yellow-400 font-semibold underline"}`}>{photo.lensModel}</span></p>
+				</div>
 			</div>
 
-			<div className="flex flex-col gap-1 mb-6">
-				<p className="text-lg font-semibold">
-					<span className={`${sortBy == "cameraName" && "text-yellow-400 font-semibold underline"}`}>{photo.cameraName}</span> <span className={`${sortBy == "cameraModel" && "text-yellow-400 font-semibold underline"}`}>{photo.cameraModel}</span>
-				</p>
-				<p className="opacity-50"><span className={`${sortBy == "lensModel" && "text-yellow-400 font-semibold underline"}`}>{photo.lensModel}</span></p>
+			<div className="mb-8">
+				<div className="opacity-50 flex items-center gap-3 mb-2">
+					<UserCircleIcon size={18} weight="duotone" />
+					<p className="text-sm">Photographed person</p>
+				</div>
+
+				<ul className="list-inside list-disc">
+					{photo.people.map((person) => (
+						<li key={`${person.personId}`}>{person.facebook || person.instagram}</li>
+					))}
+				</ul>
 			</div>
 
 			<div className="flex flex-col gap-1">

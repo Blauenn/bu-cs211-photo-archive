@@ -1,6 +1,7 @@
 export type SortKey =
 	| "unsorted"
 	| "photoId"
+	| "people"
 	| "fileName"
 	| "cameraName"
 	| "cameraModel"

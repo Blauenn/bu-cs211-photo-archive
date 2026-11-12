@@ -20,6 +20,7 @@ export default function PhotoCard({ index, photo, sortBy, onDelete, selected, on
 	const formattedPhoto = {
 		photoId: `${photo.photoId}`,
 		fileName: `${photo.fileName}`,
+		people: photo.people.map((person) => person.facebook || person.instagram).join(", "),
 		cameraName: `${photo.cameraName}`,
 		cameraModel: `${photo.cameraModel}`,
 		lensModel: photo.lensModel.includes("----") ? "N/A" : photo.lensModel,
@@ -38,7 +39,7 @@ export default function PhotoCard({ index, photo, sortBy, onDelete, selected, on
 					? "border-2 border-purple-400/50"
 					: "border border-gray-200 hover:border-purple-400/50"
 				}
-			    relative group border-gray-200 rounded-2xl shadow-sm flex flex-col items-center gap-4 p-3 transition-all duration-100`}>
+			    relative group border-gray-200 rounded-2xl shadow-sm flex flex-col items-center gap-4 p-3 transition-all duration-100 cursor-pointer`}>
 			{sortBy != "unsorted" && (
 				<div className="absolute size-10 -left-3 -top-3 z-10 bg-purple-400 text-white p-2 shadow-sm flex items-center justify-center rounded-full">
 					<p className={`${String(index).length >= 3

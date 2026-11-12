@@ -23,7 +23,7 @@ export default function BucketPhoto({ highlight, hashTable, entry, onDelete, sel
 			onClick={() => { onSelect(entry.value) }}
 			className={`
 			    
-			    group relative rounded-xl flex flex-col items-center gap-2 transition-all duration-100`}
+			    group relative rounded-xl flex flex-col items-center gap-2 transition-all duration-100 cursor-pointer`}
 		>
 			<button
 				onClick={(event) => {

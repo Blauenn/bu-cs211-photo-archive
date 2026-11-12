@@ -30,7 +30,7 @@ export default function PhotoNode({ data }: NodeProps<Node<PhotoNodeData, "photo
 					? "bg-yellow-400 border-transparent"
 					: "border-gray-200"
 				}
-			    border rounded-2xl bg-white transition-all duration-100`}
+			    border rounded-2xl bg-white transition-all duration-100 cursor-pointer`}
 		>
 			<Handle
 				type="target"

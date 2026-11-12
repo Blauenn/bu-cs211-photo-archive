@@ -60,6 +60,20 @@ export default function MergeSort({ photos }: Props) {
 					if (first > second) comparison = 1
 				}
 
+				// Only sort by the first person in the people array 
+				// for simplicity sake.
+				if (sortBy === "people") {
+					const firstPerson =
+						a.people[0]?.facebook ?? a.people[0]?.instagram ?? ""
+
+					const secondPerson =
+						b.people[0]?.facebook ?? b.people[0]?.instagram ?? ""
+
+					return descending
+						? secondPerson.localeCompare(firstPerson)
+						: firstPerson.localeCompare(secondPerson)
+				}
+
 				return descending ? -comparison : comparison
 			})
 

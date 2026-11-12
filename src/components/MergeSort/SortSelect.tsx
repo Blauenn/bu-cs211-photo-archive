@@ -8,6 +8,7 @@ type Props = {
 const sortOptions: { key: SortKey; label: string }[] = [
 	{ key: "unsorted", label: "Unsorted" },
 	{ key: "photoId", label: "Photo ID" },
+	{ key: "people", label: "Photographed person" },
 	{ key: "fileName", label: "File Name" },
 	{ key: "cameraName", label: "Camera Name" },
 	{ key: "cameraModel", label: "Camera Model" },
