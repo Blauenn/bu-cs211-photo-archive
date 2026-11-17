@@ -8,6 +8,8 @@ import {
 	CalendarIcon,
 	FloppyDiskIcon,
 	UserCircleIcon,
+	LightningIcon,
+	LightningSlashIcon,
 } from "@phosphor-icons/react"
 import type { Photo } from "../../types/photo"
 import PhotoInfoRow from "./PhotoInfoRow"
@@ -79,7 +81,6 @@ export default function PhotoPreview({ photo, sortBy, className }: Props) {
 			</div>
 
 			<div className="flex flex-col gap-1">
-
 				<PhotoInfoRow
 					icon={<TimerIcon size={20} weight="duotone" />}
 					label="Exposure time"
@@ -104,17 +105,31 @@ export default function PhotoPreview({ photo, sortBy, className }: Props) {
 					highlight={sortBy == "iso"}
 				/>
 
+				<PhotoInfoRow
+					icon={<MountainsIcon size={20} weight="duotone" />}
+					label="Focal length"
+					value={
+						photo.shotFocalLength
+							? `${photo.shotFocalLength}mm`
+							: "N/A"
+					}
+					highlight={sortBy == "shotFocalLength"}
+				/>
+
 				<div className="mb-4">
-					<PhotoInfoRow
-						icon={<MountainsIcon size={20} weight="duotone" />}
-						label="Focal length"
-						value={
-							photo.shotFocalLength
-								? `${photo.shotFocalLength}mm`
-								: "N/A"
-						}
-						highlight={sortBy == "shotFocalLength"}
-					/>
+					{photo.flash ? (
+						<PhotoInfoRow
+							icon={<LightningIcon size={20} weight="duotone" className="text-yellow-400" />}
+							label="Flash"
+							value="Fired"
+						/>
+					) : (
+						<PhotoInfoRow
+							icon={<LightningSlashIcon size={20} weight="duotone" />}
+							label="Flash"
+							value="Not fired"
+						/>
+					)}
 				</div>
 
 				<PhotoInfoRow
